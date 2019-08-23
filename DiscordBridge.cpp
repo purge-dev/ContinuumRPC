@@ -1,18 +1,10 @@
-// DiscordBridge.cpp : Defines the entry point for the application.
-//
-
-#include "stdafx.h"
 #include "DiscordBridge.h"
-#include "discordsdk\discord.h"
-#include <chrono>
-#include <thread>
-
-#define MAX_LOADSTRING 100
 
 discord::Core* core{};
-double start_time = std::chrono::duration_cast<std::chrono::seconds>(std::chrono::system_clock::now().time_since_epoch()).count();
+DiscordState state{};
 
 // Global Variables:
+#define MAX_LOADSTRING 100
 HINSTANCE hInst;                                // current instance
 WCHAR szTitle[MAX_LOADSTRING];                  // The title bar text
 WCHAR szWindowClass[MAX_LOADSTRING];            // the main window class name
@@ -23,40 +15,101 @@ BOOL                InitInstance(HINSTANCE, int);
 LRESULT CALLBACK    WndProc(HWND, UINT, WPARAM, LPARAM);
 INT_PTR CALLBACK    About(HWND, UINT, WPARAM, LPARAM);
 
-void isPlaying()
+// Continuum related Handle Functions
+HWND g_HWND = NULL;
+BOOL CALLBACK EnumWindowsProcMy(HWND hwnd, LPARAM lParam)
 {
-	HWND hwnd;
-	discord::Activity activity{};
-	double now = std::chrono::duration_cast<std::chrono::seconds>(std::chrono::system_clock::now().time_since_epoch()).count();
-	
-	if ((FindWindow(0, _T("Subspace Continuum")) != NULL) || (FindWindow(0, _T("Subspace Continuum 0.40")) != NULL))
+	DWORD lpdwProcessId;
+	GetWindowThreadProcessId(hwnd, &lpdwProcessId);
+	if (lpdwProcessId == lParam)
 	{
-		hwnd = FindWindow(0, _T("Subspace Continuum"));
-		activity.GetAssets().SetLargeImage("large-ss");
-		if (GetForegroundWindow() == hwnd)
-		{
-			activity.SetDetails("Playing");
-			activity.GetAssets().SetSmallImage("playing");
-		}
-		else
-		{
-			activity.SetDetails("Idle");
-			activity.GetAssets().SetSmallImage("idle");
-		}
+		g_HWND = hwnd;
+		return FALSE;
 	}
-	else
+	return TRUE;
+}
+
+// Misc Helper Functions
+bool CMPSTART(const char *control, const char *constant) // ripped from MERV
+{
+	char c;
+
+	while (c = *control)
+	{
+		if (*constant != c)
+			return false;
+
+		++control;
+		++constant;
+	}
+
+	return true;
+}
+
+std::string createHash(int len)
+{
+	srand(time(0));
+	std::string str = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+	std::string hash_s;
+	int pos;
+	while (hash_s.size() != len) {
+		pos = ((rand() % (str.size() - 1)));
+		hash_s += str.substr(pos, 1);
+	}
+	return hash_s;
+}
+
+// Discord Core Initializer 
+void DiscordInit()
+{
+	char install_dir[MAX_PATH];
+	GetCurrentDirectoryA(MAX_PATH, install_dir);
+	sprintf_s(install_dir, "%s\\%s", install_dir, "Continuum.exe"); 
+	auto result = discord::Core::Create(611578814073405465, DiscordCreateFlags_Default, &core);
+	state.core.reset(core);
+
+	if (!state.core) // Discord failed to instantiate
 		exit(0);
 
-	activity.GetTimestamps().SetStart(now - (now - start_time));
-	core->ActivityManager().UpdateActivity(activity, [](discord::Result result) {
+	// Logger - uncomment when testing
+	/*
+	state.core->SetLogHook(discord::LogLevel::Error, [](discord::LogLevel level, const char* message){
+		MessageBoxA(NULL, message, "Error", MB_ICONERROR);
 	});
-	::core->RunCallbacks();
+	*/
+	// Discord's game launching command 
+	state.core->ActivityManager().RegisterCommand(install_dir); // this will allow users to launch game from Join and appear in Game Activity/Library (this exe)
+	state.core->ActivityManager().RegisterSteam(352700);        // this will make it appear in Library as Steam game and launch via Steam
 
-	std::thread([=]()
-	{
-		std::this_thread::sleep_for(std::chrono::seconds(6)); // updateActivity ratelimited at 4 updates/20 sec
-		isPlaying();
-	}).detach();
+	// Relevant Events -> these are received by running RunCallbacks() very often
+
+	/* OnActivityJoin 
+	*  Fires when a user accepts a game chat invite or receives confirmation from Asking to Join. */
+	state.core->ActivityManager().OnActivityJoin.Connect([](const char* secret) { 
+		state.activity.joinParty(secret);
+	});
+	/* OnActivityJoinRequest
+	*  Fires when a user asks to join the current user's game. */
+	state.core->ActivityManager().OnActivityJoinRequest.Connect([](discord::User const& user) {
+		state.requester = user;
+		state.activity.updateParty();
+	});
+	/* OnActivityInvite
+	*  Fires when the user receives a join or spectate invite.*/
+	state.core->ActivityManager().OnActivityInvite.Connect([](discord::ActivityActionType, discord::User const& user, discord::Activity const&) {
+		state.inviter = user;
+	});
+	/* OnCurrentUserUpdate
+	*  Fires when the User struct of the currently connected user changes. They may have changed their avatar, username, or something else. */
+	state.core->UserManager().OnCurrentUserUpdate.Connect([]() {              
+		state.core->UserManager().GetCurrentUser(&state.selfusr);
+	});
+	/* OnToggle
+	*  Fires when the overlay is locked or unlocked(a.k.a.opened or closed) 
+	state.core->OverlayManager().OnToggle.Connect([](bool locked) {       // Continuum not supported? (needs a DirectX handle to THIS process for hook -> ?impossible) 
+		state.overlayLocked = locked;
+	});
+	*/
 }
 
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
@@ -67,13 +120,22 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     UNREFERENCED_PARAMETER(hPrevInstance);
     UNREFERENCED_PARAMETER(lpCmdLine);
 
-    // Entry point 
-	auto result = discord::Core::Create(611578814073405465, DiscordCreateFlags_Default, &core);
+	// Start Continuum_main.exe
+	state.cont.startGameClient();
 
-	std::thread([=]() 
-	{
-		std::this_thread::sleep_for(std::chrono::seconds(6)); // allow Continuum.exe to open, may need to be longer for slower systems
-		isPlaying();
+    // Entry point for SDK-Client interface
+	DiscordInit();
+
+	// Begin RPC
+	std::thread([=]() {
+		std::this_thread::sleep_for(std::chrono::seconds(6)); // wait for SS to load
+		if (GAMEPROCESSOFFLINE == 0) // game process is available
+			state.activity.generatePresence();
+		else                      // exit out if it hasn't started -> ?remove because of slow PCs
+		{
+			state.core->~Core();
+			exit(0);
+		}
 	}).detach();
 
     // Initialize global strings
@@ -98,14 +160,12 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
         {
             TranslateMessage(&msg);
             DispatchMessage(&msg);
-			::core->RunCallbacks();
+			state.core->RunCallbacks();
         }
     }
 
     return (int) msg.wParam;
 }
-
-
 
 //
 //  FUNCTION: MyRegisterClass()
@@ -155,7 +215,7 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
       return FALSE;
    }
 
-  // ShowWindow(hWnd, nCmdShow);
+//   ShowWindow(hWnd, nCmdShow);
    UpdateWindow(hWnd);
 
    return TRUE;
