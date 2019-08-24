@@ -37,3 +37,15 @@ DWORD Continuum::getGameProcess()
 
 	CloseHandle(snapshot);
 }
+
+bool Continuum::isSteamUser()
+{
+	char path[MAX_PATH];
+	GetCurrentDirectoryA(MAX_PATH, path);
+
+	std::string fullpath = path;
+	if (fullpath.find("Steam") != fullpath.npos) // simple but works
+		return true;
+	else
+		return false;
+}

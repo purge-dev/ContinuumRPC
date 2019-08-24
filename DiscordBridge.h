@@ -31,8 +31,6 @@ public:
 	void joinParty(const char* pw);
 	void createParty();
 	void updateParty();
-private:
-	bool isSteamUser();
 };
 
 // Continuum handle code
@@ -41,6 +39,7 @@ class Continuum
 public:
 	void startGameClient();
 	DWORD getGameProcess();
+	bool isSteamUser();
 };
 
 struct DiscordState 

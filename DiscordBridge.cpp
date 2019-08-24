@@ -79,7 +79,8 @@ void DiscordInit()
 	*/
 	// Discord's game launching command 
 	state.core->ActivityManager().RegisterCommand(install_dir); // this will allow users to launch game from Join and appear in Game Activity/Library (this exe)
-	state.core->ActivityManager().RegisterSteam(352700);        // this will make it appear in Library as Steam game and launch via Steam
+	if (state.cont.isSteamUser())
+		state.core->ActivityManager().RegisterSteam(352700);        // this will make it appear in Library as Steam game and launch via Steam
 
 	// Relevant Events -> these are received by running RunCallbacks() very often
 

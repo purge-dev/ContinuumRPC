@@ -4,14 +4,6 @@ double start_time = std::chrono::duration_cast<std::chrono::seconds>(std::chrono
 int mode = -1;
 #define MAXPARTYSIZE 8
 
-bool MyActivity::isSteamUser()
-{
-	if (FindWindow(0, _T("Subspace Continuum")) != NULL || FindWindow(0, _T("Subspace Continuum 0.40")) != NULL)
-		return true;
-	else if (FindWindow(0, _T("Continuum")) != NULL || FindWindow(0, _T("Continuum 0.40")) != NULL) // todo: further dissect "Continuum" -> window styles?
-		return false;
-}
-
 void MyActivity::joinParty(const char* pw)
 {
 	state.core_activity.GetParty().GetSize().SetCurrentSize(state.core_activity.GetParty().GetSize().GetCurrentSize() + 1);
@@ -21,7 +13,7 @@ void MyActivity::joinParty(const char* pw)
 	state.core->RunCallbacks();
 }
 
-void MyActivity::updateParty()
+void MyActivity::updateParty() // Parties are not networked, instead we may want to use Lobbies, but its use has no more benefit due to closed source
 {
 	state.core_activity.GetParty().GetSize().SetCurrentSize(state.core_activity.GetParty().GetSize().GetCurrentSize() + 1);
 	state.core->ActivityManager().UpdateActivity(state.core_activity, [](discord::Result result) {
@@ -43,10 +35,13 @@ void MyActivity::generatePresence()
 	HWND hwnd;
 	double now = std::chrono::duration_cast<std::chrono::seconds>(std::chrono::system_clock::now().time_since_epoch()).count();
 
-	if (isSteamUser())
-		hwnd = FindWindow(0, _T("Subspace Continuum"));
+	if (state.cont.isSteamUser())
+		hwnd = FindWindow(0, _T("Subspace Continuum")); // steam + discord users
 	else
-		hwnd = FindWindow(0, _T("Continuum"));
+		if (FindWindow(0, _T("Continuum")) == NULL)
+			hwnd = FindWindow(0, _T("Subspace Continuum")); // discord installs
+		else
+			hwnd = FindWindow(0, _T("Continuum")); // legacy
 
 	if (strcmp(state.core_activity.GetParty().GetId(), "") == 0) // is this user in a party?
 		createParty(); // create party for others to join with a unique pw
