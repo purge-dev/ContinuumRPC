@@ -47,7 +47,6 @@ struct DiscordState
 	Continuum cont;
 	MyActivity activity;
 	discord::Activity core_activity{};
-	bool overlayLocked;
 	discord::User selfusr;
 	discord::User requester;
 	discord::User inviter;
