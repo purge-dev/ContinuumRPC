@@ -1,4 +1,4 @@
 # ContinuumRPC
 Provides Discord Rich Presence for the game Subspace Continuum. 
 
-Do not share code as ApplicationID is hardcoded (may provide entry for outside SDK kits).
+appID is the Client ID required in order to connect to Discord's end (seen in developer portal).
