@@ -65,7 +65,7 @@ void DiscordInit()
 	char install_dir[MAX_PATH];
 	GetCurrentDirectoryA(MAX_PATH, install_dir);
 	sprintf_s(install_dir, "%s\\%s", install_dir, "Continuum.exe"); 
-	auto result = discord::Core::Create(611578814073405465, DiscordCreateFlags_Default, &core);
+	auto result = discord::Core::Create(appID, DiscordCreateFlags_Default, &core);
 	state.core.reset(core);
 
 	if (!state.core) // Discord failed to instantiate
