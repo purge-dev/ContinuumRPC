@@ -17,6 +17,8 @@ INT_PTR CALLBACK    About(HWND, UINT, WPARAM, LPARAM);
 
 // Continuum related Handle Functions
 HWND g_HWND = NULL;
+HHOOK hHook;
+
 BOOL CALLBACK EnumWindowsProcMy(HWND hwnd, LPARAM lParam)
 {
 	DWORD lpdwProcessId;
@@ -46,17 +48,100 @@ bool CMPSTART(const char *control, const char *constant) // ripped from MERV
 	return true;
 }
 
-std::string createHash(int len)
+// Keyboard global hook to detect ship changes
+LRESULT CALLBACK LowLevelKeyboardProc(int nCode, WPARAM wParam, LPARAM lParam)
 {
-	srand(time(0));
-	std::string str = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
-	std::string hash_s;
-	int pos;
-	while (hash_s.size() != len) {
-		pos = ((rand() % (str.size() - 1)));
-		hash_s += str.substr(pos, 1);
-	}
-	return hash_s;
+    KBDLLHOOKSTRUCT* pKbdLLHookStruct = (KBDLLHOOKSTRUCT*)lParam;
+    if (state.cont.inGame())
+    {
+        if (wParam == WM_KEYDOWN)
+        {
+            switch (pKbdLLHookStruct->vkCode)
+            {
+            case VK_ESCAPE : 
+            {
+                if (state.cont.inMenu) // if they are closing the menu without selecting a ship, reset
+                    state.cont.inMenu = false;
+                else
+                    state.cont.inMenu = true;
+                break;
+            }
+			case 0x31:
+			{
+				if (state.cont.inMenu)
+				{
+					state.cont.ship = 0;
+				}
+                break;
+			}
+            case 0x32:
+            {
+                if (state.cont.inMenu)
+                {
+                    state.cont.ship = 1;
+                }
+                break;
+            }
+            case 0x33:
+            {
+                if (state.cont.inMenu)
+                {
+                    state.cont.ship = 2;
+                }
+                break;
+            }
+            case 0x34:
+            {
+                if (state.cont.inMenu)
+                {
+                    state.cont.ship = 3;
+                }
+                break;
+            }
+            case 0x35:
+            {
+                if (state.cont.inMenu)
+                {
+                    state.cont.ship = 4;
+                }
+                break;
+            }
+            case 0x36:
+            {
+                if (state.cont.inMenu)
+                {
+                    state.cont.ship = 5;
+                }
+                break;
+            }
+            case 0x37:
+            {
+                if (state.cont.inMenu)
+                {
+                    state.cont.ship = 6;
+                }
+                break;
+            }
+            case 0x38:
+            {
+                if (state.cont.inMenu)
+                {
+                    state.cont.ship = 7;
+                }
+                break;
+            }
+            case 0x53:
+            {
+                if (state.cont.inMenu)
+                {
+                    state.cont.ship = 8;
+                }
+                break;
+            }
+			} 
+        }
+    }
+    return CallNextHookEx(hHook, nCode, wParam, lParam);
 }
 
 // Discord Core Initializer 
@@ -86,18 +171,18 @@ void DiscordInit()
 
 	/* OnActivityJoin 
 	*  Fires when a user accepts a game chat invite or receives confirmation from Asking to Join. */
-	state.core->ActivityManager().OnActivityJoin.Connect([](const char* secret) { 
+/*	state.core->ActivityManager().OnActivityJoin.Connect([](const char* secret) { 
 		state.activity.joinParty(secret);
 	});
 	/* OnActivityJoinRequest
 	*  Fires when a user asks to join the current user's game. */
-	state.core->ActivityManager().OnActivityJoinRequest.Connect([](discord::User const& user) {
+/*	state.core->ActivityManager().OnActivityJoinRequest.Connect([](discord::User const& user) {
 		state.requester = user;
 		state.activity.updateParty();
 	});
 	/* OnActivityInvite
 	*  Fires when the user receives a join or spectate invite.*/
-	state.core->ActivityManager().OnActivityInvite.Connect([](discord::ActivityActionType, discord::User const& user, discord::Activity const&) {
+/*	state.core->ActivityManager().OnActivityInvite.Connect([](discord::ActivityActionType, discord::User const& user, discord::Activity const&) {
 		state.inviter = user;
 	});
 	/* OnCurrentUserUpdate
@@ -151,12 +236,13 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     }
 
     HACCEL hAccelTable = LoadAccelerators(hInstance, MAKEINTRESOURCE(IDC_DISCORDBRIDGE));
+    hHook = SetWindowsHookEx(WH_KEYBOARD_LL, LowLevelKeyboardProc, hInstance, 0);
 
     MSG msg;
 
     // Main message loop:
     while (GetMessage(&msg, nullptr, 0, 0))
-    {
+    {   
         if (!TranslateAccelerator(msg.hwnd, hAccelTable, &msg))
         {
             TranslateMessage(&msg);
@@ -216,7 +302,7 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
       return FALSE;
    }
 
-//   ShowWindow(hWnd, nCmdShow);
+ //  ShowWindow(hWnd, nCmdShow);
    UpdateWindow(hWnd);
 
    return TRUE;

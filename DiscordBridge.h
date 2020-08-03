@@ -28,9 +28,11 @@ class MyActivity
 {
 public:
 	void generatePresence();
+	/*
 	void joinParty(const char* pw);
 	void createParty();
 	void updateParty();
+	*/
 };
 
 // Continuum handle code
@@ -40,6 +42,9 @@ public:
 	void startGameClient();
 	DWORD getGameProcess();
 	bool isSteamUser();
+	bool inGame();
+	int ship = 2;
+	bool inMenu = false;
 };
 
 struct DiscordState 
@@ -48,8 +53,6 @@ struct DiscordState
 	MyActivity activity;
 	discord::Activity core_activity{};
 	discord::User selfusr;
-	discord::User requester;
-	discord::User inviter;
 	std::unique_ptr<discord::Core> core;
 };
 
@@ -57,6 +60,5 @@ extern DiscordState state;
 
 // Misc Helper Functions
 bool CMPSTART(const char *control, const char *constant);
-std::string createHash(int len);
 
 #endif DISCORDBRIDGE_H

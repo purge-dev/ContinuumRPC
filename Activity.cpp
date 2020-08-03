@@ -2,8 +2,10 @@
 
 double start_time = std::chrono::duration_cast<std::chrono::seconds>(std::chrono::system_clock::now().time_since_epoch()).count();
 int mode = -1;
-#define MAXPARTYSIZE 8
 
+//#define MAXPARTYSIZE 8
+
+/* Joining/Party is too troublesome to implement and is useless now
 void MyActivity::joinParty(const char* pw)
 {
 	state.core_activity.GetParty().GetSize().SetCurrentSize(state.core_activity.GetParty().GetSize().GetCurrentSize() + 1);
@@ -29,49 +31,84 @@ void MyActivity::createParty()
 	state.core_activity.GetSecrets().SetJoin(createHash(6).c_str());
 	// must eventually end in updateActivity in calling function
 }
-
+*/
 void MyActivity::generatePresence()
 {
-	HWND hwnd;
 	double now = std::chrono::duration_cast<std::chrono::seconds>(std::chrono::system_clock::now().time_since_epoch()).count();
 
-	if (state.cont.isSteamUser())
-		hwnd = FindWindow(0, _T("Subspace Continuum")); // steam + discord users
-	else
-		if (FindWindow(0, _T("Continuum")) == NULL)
-			hwnd = FindWindow(0, _T("Subspace Continuum")); // discord installs
-		else
-			hwnd = FindWindow(0, _T("Continuum")); // legacy
-
+	/*
 	if (strcmp(state.core_activity.GetParty().GetId(), "") == 0) // is this user in a party?
 		createParty(); // create party for others to join with a unique pw
 	else
 		state.core_activity.GetParty().GetSize().SetCurrentSize(state.core_activity.GetParty().GetSize().GetCurrentSize()); // update party's size 
-
+		*/
 	state.core_activity.GetAssets().SetLargeImage("large-ss");
 	state.core_activity.GetAssets().SetLargeText("Subspace Continuum");	
 	state.core_activity.SetType(discord::ActivityType::Playing);
 
-	if (GetForegroundWindow() == hwnd) // active game window
+	if (state.cont.inGame()) // active game window
 	{
 		if (mode != 0)
 		{
 			start_time = std::chrono::duration_cast<std::chrono::seconds>(std::chrono::system_clock::now().time_since_epoch()).count();
 			mode = 0;
 		}
-		if (state.core_activity.GetParty().GetSize().GetCurrentSize() > 1)
+
+		state.core_activity.SetDetails("");
+
+		if (state.cont.ship == 8)
 		{
-			state.core_activity.SetDetails("Playing");
-			state.core_activity.SetState("In a Team");
+			state.core_activity.SetState("Spectating");
+			state.core_activity.GetAssets().SetSmallImage("idle");
+			state.core_activity.GetAssets().SetSmallText("Spectator Mode");
 		}
 		else
 		{
-			state.core_activity.SetDetails("");
-			state.core_activity.SetState("Playing Solo");
+			if (state.cont.ship == 0)
+			{
+				state.core_activity.GetAssets().SetSmallImage("playing");
+				state.core_activity.GetAssets().SetSmallText("Playing as Warbird");
+			}
+			else if (state.cont.ship == 1)
+			{
+				state.core_activity.GetAssets().SetSmallImage("jav");
+				state.core_activity.GetAssets().SetSmallText("Playing as Javelin");
+			}
+			else if (state.cont.ship == 2)
+			{
+				state.core_activity.GetAssets().SetSmallImage("spid");
+				state.core_activity.GetAssets().SetSmallText("Playing as Spider");
+			}
+			else if (state.cont.ship == 3)
+			{
+				state.core_activity.GetAssets().SetSmallImage("lev");
+				state.core_activity.GetAssets().SetSmallText("Playing as Leviathan");
+			}
+			else if (state.cont.ship == 4)
+			{
+				state.core_activity.GetAssets().SetSmallImage("terr");
+				state.core_activity.GetAssets().SetSmallText("Playing as Terrier");
+			}
+			else if (state.cont.ship == 5)
+			{
+				state.core_activity.GetAssets().SetSmallImage("weas");
+				state.core_activity.GetAssets().SetSmallText("Playing as Weasel");
+			}
+			else if (state.cont.ship == 6)
+			{
+				state.core_activity.GetAssets().SetSmallImage("lanc");
+				state.core_activity.GetAssets().SetSmallText("Playing as Lancaster");
+			}
+			else if (state.cont.ship == 7)
+			{
+				state.core_activity.GetAssets().SetSmallImage("sha");
+				state.core_activity.GetAssets().SetSmallText("Playing as Shark");
+			}
+
+			state.core_activity.SetState("Playing");
 		}
 
-		state.core_activity.GetAssets().SetSmallImage("playing");
-		state.core_activity.GetAssets().SetSmallText("In Game");
+		state.cont.inMenu = false;
 		state.core_activity.GetTimestamps().SetStart(now - (now - start_time));
 	}
 	else
@@ -87,14 +124,11 @@ void MyActivity::generatePresence()
 				start_time = std::chrono::duration_cast<std::chrono::seconds>(std::chrono::system_clock::now().time_since_epoch()).count();
 				mode = 1;
 			}
-			if (state.core_activity.GetParty().GetSize().GetCurrentSize() > 1)
-				state.core_activity.SetState("In a Team");
-			else
-				state.core_activity.SetState("Looking for Players");
 
 			state.core_activity.SetDetails("Chatting");
+			state.core_activity.SetState("");
 			state.core_activity.GetAssets().SetSmallImage("chat");
-			state.core_activity.GetAssets().SetSmallText("Chatting through Client");
+			state.core_activity.GetAssets().SetSmallText("Chatting in Game");
 			state.core_activity.GetTimestamps().SetStart(now - (now - start_time));
 		}
 		else if ((CMPSTART("Subspace Continuum 0.40", text) || (CMPSTART("Continuum 0.40", text)))) // launcher
@@ -104,15 +138,11 @@ void MyActivity::generatePresence()
 				start_time = std::chrono::duration_cast<std::chrono::seconds>(std::chrono::system_clock::now().time_since_epoch()).count();
 				mode = 2;
 			}
-			if (state.core_activity.GetParty().GetSize().GetCurrentSize() > 1)
-				state.core_activity.SetState("In a Team");
-			else
-				state.core_activity.SetState("Looking for Players");
 
 			state.core_activity.SetDetails("Selecting Zone");
 			state.core_activity.GetAssets().SetSmallImage("launcher");
 			state.core_activity.GetAssets().SetSmallText("Game Launcher");
-			state.core_activity.GetTimestamps().SetStart(now - (now - start_time));
+			state.core_activity.GetTimestamps().SetStart(0);
 		}
 		else
 		{
@@ -121,12 +151,9 @@ void MyActivity::generatePresence()
 				start_time = std::chrono::duration_cast<std::chrono::seconds>(std::chrono::system_clock::now().time_since_epoch()).count();
 				mode = 1;
 			}
-			if (state.core_activity.GetParty().GetSize().GetCurrentSize() > 1)
-				state.core_activity.SetState("In a Team");
-			else
-				state.core_activity.SetState("Looking for Players");
 
 			state.core_activity.SetDetails("Idle");
+			state.core_activity.SetState("");
 			state.core_activity.GetAssets().SetSmallImage("idle2");
 			state.core_activity.GetAssets().SetSmallText("Waiting for Game");
 			state.core_activity.GetTimestamps().SetStart(now - (now - start_time));
