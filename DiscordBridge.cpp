@@ -48,7 +48,7 @@ bool CMPSTART(const char *control, const char *constant) // ripped from MERV
 	return true;
 }
 
-// Keyboard global hook to detect ship changes
+// Keyboard global hook to detect ship changes (unreliable since rate limits must be obeyed)
 LRESULT CALLBACK LowLevelKeyboardProc(int nCode, WPARAM wParam, LPARAM lParam)
 {
     KBDLLHOOKSTRUCT* pKbdLLHookStruct = (KBDLLHOOKSTRUCT*)lParam;
@@ -221,8 +221,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 		{
 			state.core->~Core();
 			exit(0);
-		}
-	}).detach();
+		}}).detach();
 
     // Initialize global strings
     LoadStringW(hInstance, IDS_APP_TITLE, szTitle, MAX_LOADSTRING);

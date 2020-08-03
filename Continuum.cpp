@@ -66,3 +66,17 @@ bool Continuum::inGame()
 	else
 		return false;
 }
+
+int Continuum::gameWindow()
+{
+	char text[32];
+	HWND alt = GetForegroundWindow();
+	GetWindowTextA(alt, text, 32);
+
+	if ((CMPSTART("Subspace Continuum 0.40 -", text) || (CMPSTART("Continuum 0.40 -", text)))) // chat menu
+		return 1;
+	else if ((CMPSTART("Subspace Continuum 0.40", text) || (CMPSTART("Continuum 0.40", text)))) // launcher
+		return 2;
+	else
+		return 3;
+}

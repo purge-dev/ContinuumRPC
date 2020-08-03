@@ -28,6 +28,8 @@ class MyActivity
 {
 public:
 	void generatePresence();
+	void setMainRPC(const char* largeImage, const char* largeImageText, discord::ActivityType type);
+	void setSubRPC(const char* stateText, const char* smallImage, const char* smallImageText, const char* details, discord::Timestamp timer);
 	/*
 	void joinParty(const char* pw);
 	void createParty();
@@ -43,6 +45,7 @@ public:
 	DWORD getGameProcess();
 	bool isSteamUser();
 	bool inGame();
+	int gameWindow();
 	int ship = 2;
 	bool inMenu = false;
 };
