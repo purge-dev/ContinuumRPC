@@ -46,7 +46,8 @@ public:
 	bool isSteamUser();
 	bool inGame();
 	int gameWindow();
-	int ship = 2;
+	std::wstring getRegValue(std::wstring val);
+	int ship;
 	bool inMenu = false;
 };
 
@@ -63,5 +64,6 @@ extern DiscordState state;
 
 // Misc Helper Functions
 bool CMPSTART(const char *control, const char *constant);
+std::string multiByteString(const std::wstring& wstr);
 
 #endif DISCORDBRIDGE_H

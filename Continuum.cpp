@@ -80,3 +80,41 @@ int Continuum::gameWindow()
 	else
 		return 3;
 }
+
+std::wstring Continuum::getRegValue(std::wstring val)
+{
+	HKEY hKey;
+	if (RegOpenKeyEx(HKEY_CURRENT_USER, L"SOFTWARE\\Continuum\\State", 0, KEY_READ, &hKey) != ERROR_SUCCESS)
+		throw "Registry entry not found!";
+
+	DWORD type, cbData, buff;
+
+	if (RegQueryValueEx(hKey, val.c_str(), NULL, &type, NULL, &cbData) != ERROR_SUCCESS)
+		RegCloseKey(hKey);
+
+	std::wstring value(cbData / sizeof(wchar_t), L'\0');
+	if (type == REG_DWORD)
+	{
+		if (RegQueryValueEx(hKey, val.c_str(), NULL, &type, (LPBYTE)&buff, &cbData) != ERROR_SUCCESS)
+			RegCloseKey(hKey);
+
+		size_t firstNull = value.find_first_of(L'\0');
+		if (firstNull != std::string::npos)
+			value.resize(firstNull);
+
+		RegCloseKey(hKey);
+		return std::to_wstring(buff);
+	}
+	else if (type == REG_SZ)
+	{
+		if (RegQueryValueEx(hKey, val.c_str(), NULL, NULL, reinterpret_cast<LPBYTE>(&value[0]), &cbData) != ERROR_SUCCESS)
+			RegCloseKey(hKey);
+
+		size_t firstNull = value.find_first_of(L'\0');
+		if (firstNull != std::string::npos)
+			value.resize(firstNull);
+
+		RegCloseKey(hKey);
+		return value;
+	}
+}

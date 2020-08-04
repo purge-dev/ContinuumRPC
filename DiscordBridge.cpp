@@ -48,6 +48,15 @@ bool CMPSTART(const char *control, const char *constant) // ripped from MERV
 	return true;
 }
 
+std::string multiByteString(const std::wstring& wstr)
+{
+    if (wstr.empty()) return std::string();
+    int size = WideCharToMultiByte(CP_UTF8, 0, &wstr[0], (int)wstr.size(), NULL, 0, NULL, NULL);
+    std::string resStr(size, 0);
+    WideCharToMultiByte(CP_UTF8, 0, &wstr[0], (int)wstr.size(), &resStr[0], size, NULL, NULL);
+    return resStr;
+}
+
 // Keyboard global hook to detect ship changes (unreliable since rate limits must be obeyed)
 LRESULT CALLBACK LowLevelKeyboardProc(int nCode, WPARAM wParam, LPARAM lParam)
 {
@@ -215,8 +224,11 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	// Begin RPC
 	std::thread([=]() {
 		std::this_thread::sleep_for(std::chrono::seconds(6)); // wait for SS to load
-		if (GAMEPROCESSOFFLINE == 0) // game process is available
-			state.activity.generatePresence();
+        if (GAMEPROCESSOFFLINE == 0) // game process is available
+        {
+            state.activity.generatePresence();
+            state.cont.ship = atoi(multiByteString(state.cont.getRegValue(L"Ship")).c_str()); // sets ship status as last played ship
+        }
 		else                      // exit out if it hasn't started -> ?remove because of slow PCs
 		{
 			state.core->~Core();

@@ -68,25 +68,25 @@ void MyActivity::generatePresence()
 		}
 
 		if (state.cont.ship == 8)
-			setSubRPC("Spectating", "idle", "Spectator Mode", "", now - (now - start_time));
+			setSubRPC("Spectating", "idle", "Spectator Mode", multiByteString(state.cont.getRegValue(L"Zone")).c_str(), now - (now - start_time));
 		else
 		{
 			if (state.cont.ship == 0)
-				setSubRPC("Playing", "playing", "Playing as Warbird", "", now - (now - start_time));
+				setSubRPC("Playing", "playing", "Playing as Warbird", multiByteString(state.cont.getRegValue(L"Zone")).c_str(), now - (now - start_time));
 			else if (state.cont.ship == 1)
-				setSubRPC("Playing", "jav", "Playing as Javelin", "", now - (now - start_time));
+				setSubRPC("Playing", "jav", "Playing as Javelin", multiByteString(state.cont.getRegValue(L"Zone")).c_str(), now - (now - start_time));
 			else if (state.cont.ship == 2)
-				setSubRPC("Playing", "spid", "Playing as Spider", "", now - (now - start_time));
+				setSubRPC("Playing", "spid", "Playing as Spider", multiByteString(state.cont.getRegValue(L"Zone")).c_str(), now - (now - start_time));
 			else if (state.cont.ship == 3)
-				setSubRPC("Playing", "lev", "Playing as Leviathan", "", now - (now - start_time));
+				setSubRPC("Playing", "lev", "Playing as Leviathan", multiByteString(state.cont.getRegValue(L"Zone")).c_str(), now - (now - start_time));
 			else if (state.cont.ship == 4)
-				setSubRPC("Playing", "terr", "Playing as Terrier", "", now - (now - start_time));
+				setSubRPC("Playing", "terr", "Playing as Terrier", multiByteString(state.cont.getRegValue(L"Zone")).c_str(), now - (now - start_time));
 			else if (state.cont.ship == 5)
-				setSubRPC("Playing", "weas", "Playing as Weasel", "", now - (now - start_time));
+				setSubRPC("Playing", "weas", "Playing as Weasel", multiByteString(state.cont.getRegValue(L"Zone")).c_str(), now - (now - start_time));
 			else if (state.cont.ship == 6)
-				setSubRPC("Playing", "lanc", "Playing as Lancaster", "", now - (now - start_time));
+				setSubRPC("Playing", "lanc", "Playing as Lancaster", multiByteString(state.cont.getRegValue(L"Zone")).c_str(), now - (now - start_time));
 			else if (state.cont.ship == 7)
-				setSubRPC("Playing", "sha", "Playing as Shark", "", now - (now - start_time));
+				setSubRPC("Playing", "sha", "Playing as Shark", multiByteString(state.cont.getRegValue(L"Zone")).c_str(), now - (now - start_time));
 		}
 		state.cont.inMenu = false;
 	}
@@ -99,7 +99,7 @@ void MyActivity::generatePresence()
 				start_time = std::chrono::duration_cast<std::chrono::seconds>(std::chrono::system_clock::now().time_since_epoch()).count();
 				mode = 1;
 			}
-			setSubRPC("", "chat", "Chatting in Game", "Chatting", now - (now - start_time));
+			setSubRPC("Chatting", "chat", "Chatting in Game", multiByteString(state.cont.getRegValue(L"Zone")).c_str(), now - (now - start_time));
 		}
 		else if (state.cont.gameWindow() == 2) // launcher
 		{
@@ -117,7 +117,7 @@ void MyActivity::generatePresence()
 				start_time = std::chrono::duration_cast<std::chrono::seconds>(std::chrono::system_clock::now().time_since_epoch()).count();
 				mode = 1;
 			}
-			setSubRPC("", "idle2", "Waiting for Game", "Idle", now - (now - start_time));
+			setSubRPC("Idle", "idle2", "Waiting for Game", multiByteString(state.cont.getRegValue(L"Zone")).c_str(), now - (now - start_time));
 		}
 	}
 
