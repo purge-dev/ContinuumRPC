@@ -48,7 +48,7 @@ void MyActivity::setSubRPC(const char* stateText, const char* smallImage, const 
 	state.core_activity.GetTimestamps().SetStart(timer);
 }
 
-// Function that sets the user's presence every 6 seconds according to window mode/ship status
+// Sets the user's presence every 6 seconds according to window mode/ship status
 void MyActivity::generatePresence()
 {
 	double now = std::chrono::duration_cast<std::chrono::seconds>(std::chrono::system_clock::now().time_since_epoch()).count();

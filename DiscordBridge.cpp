@@ -191,7 +191,7 @@ void DiscordInit()
 		state.core->UserManager().GetCurrentUser(&state.selfusr);
 	});
 	/* OnToggle
-	*  Fires when the overlay is locked or unlocked(a.k.a.opened or closed) 
+	*  Fires when the overlay is locked or unlocked (a.k.a.opened or closed) 
 	state.core->OverlayManager().OnToggle.Connect([](bool locked) {       // Continuum not supported? (needs a DirectX handle to THIS process for hook -> ?impossible) 
 		state.overlayLocked = locked;
 	});
