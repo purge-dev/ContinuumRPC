@@ -126,8 +126,8 @@ void MyActivity::generatePresence()
 	state.core->RunCallbacks();
 
 	std::thread([=]() {
-		std::this_thread::sleep_for(std::chrono::seconds(6)); // updateActivity ratelimited at 4 updates/20 sec
-		if (GAMEPROCESSOFFLINE == 0)
+		std::this_thread::sleep_for(std::chrono::seconds(5)); // updateActivity ratelimited at 1 update/5 sec; SDK docs say requests get queued and
+		if (GAMEPROCESSOFFLINE == 0)                          // do not require developer-side intervention, but apparently it isn't so (?bug)
 			generatePresence();
 		else
 		{

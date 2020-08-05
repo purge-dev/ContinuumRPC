@@ -93,19 +93,14 @@ std::wstring Continuum::getRegValue(std::wstring val)
 		RegCloseKey(hKey);
 
 	std::wstring value(cbData / sizeof(wchar_t), L'\0');
-	if (type == REG_DWORD)
+	if (type == REG_DWORD) // ship number
 	{
 		if (RegQueryValueEx(hKey, val.c_str(), NULL, &type, (LPBYTE)&buff, &cbData) != ERROR_SUCCESS)
 			RegCloseKey(hKey);
 
-		size_t firstNull = value.find_first_of(L'\0');
-		if (firstNull != std::string::npos)
-			value.resize(firstNull);
-
-		RegCloseKey(hKey);
 		return std::to_wstring(buff);
 	}
-	else if (type == REG_SZ)
+	else if (type == REG_SZ) // zone name
 	{
 		if (RegQueryValueEx(hKey, val.c_str(), NULL, NULL, reinterpret_cast<LPBYTE>(&value[0]), &cbData) != ERROR_SUCCESS)
 			RegCloseKey(hKey);
@@ -114,7 +109,7 @@ std::wstring Continuum::getRegValue(std::wstring val)
 		if (firstNull != std::string::npos)
 			value.resize(firstNull);
 
-		RegCloseKey(hKey);
 		return value;
 	}
+	RegCloseKey(hKey);
 }
