@@ -177,7 +177,7 @@ void DiscordInit()
 	GetCurrentDirectoryA(MAX_PATH, install_dir);
 	sprintf_s(install_dir, "%s\\%s", install_dir, "Continuum.exe"); 
 
-    auto result = discord::Core::Create(611578814073405465, DiscordCreateFlags_NoRequireDiscord, &core); 
+    auto result = discord::Core::Create(appID, DiscordCreateFlags_NoRequireDiscord, &core); 
     state.core.reset(core);
 
 	if (!state.core) // Discord failed to instantiate -> avoid exit since this will prevent game exe from loading if Discord not installed
