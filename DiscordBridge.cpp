@@ -57,6 +57,23 @@ std::string multiByteString(const std::wstring& wstr) // unicode to multibyte st
     return resStr;
 }
 
+/* Savage way of checking installs before SDK got updated
+bool DiscordInstalled()
+{
+    TCHAR discordPath[MAX_PATH];
+    if (SHGetFolderPath(NULL, CSIDL_LOCAL_APPDATA, NULL, 0, discordPath) == S_OK) // accessed the local user's appdata
+    {
+        PathAppend(discordPath, TEXT("\\Discord\\.dead"));
+
+        if (PathIsDirectory(discordPath) == (BOOL)FILE_ATTRIBUTE_DIRECTORY) // discord local appdata exists only when installed
+            return true;
+        else 
+            return false;
+    }
+    else
+        return false;
+}
+*/
 // Keyboard global hook to detect ship changes (unreliable since rate limits must be obeyed)
 LRESULT CALLBACK LowLevelKeyboardProc(int nCode, WPARAM wParam, LPARAM lParam)
 {
@@ -159,11 +176,12 @@ void DiscordInit()
 	char install_dir[MAX_PATH];
 	GetCurrentDirectoryA(MAX_PATH, install_dir);
 	sprintf_s(install_dir, "%s\\%s", install_dir, "Continuum.exe"); 
-	auto result = discord::Core::Create(appID, DiscordCreateFlags_Default, &core);
-	state.core.reset(core);
 
-	if (!state.core) // Discord failed to instantiate
-		exit(0);
+    auto result = discord::Core::Create(611578814073405465, DiscordCreateFlags_NoRequireDiscord, &core); 
+    state.core.reset(core);
+
+	if (!state.core) // Discord failed to instantiate -> avoid exit since this will prevent game exe from loading if Discord not installed
+        state.core->~Core();
 
 	// Logger - uncomment when testing
 	/*

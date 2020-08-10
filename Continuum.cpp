@@ -55,7 +55,7 @@ bool Continuum::inGame()
 	HWND hwnd;
 
 	if (state.cont.isSteamUser())
-		hwnd = FindWindow(0, _T("Subspace Continuum")); // steam + discord users
+		hwnd = FindWindow(0, _T("Subspace Continuum")); // steam users
 	else
 		if (FindWindow(0, _T("Continuum")) == NULL)
 			hwnd = FindWindow(0, _T("Subspace Continuum")); // discord installs

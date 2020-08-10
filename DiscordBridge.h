@@ -65,5 +65,6 @@ extern DiscordState state;
 // Misc Helper Functions
 bool CMPSTART(const char *control, const char *constant);
 std::string multiByteString(const std::wstring& wstr);
+//bool DiscordInstalled();
 
 #endif DISCORDBRIDGE_H
