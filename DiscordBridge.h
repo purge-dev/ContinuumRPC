@@ -19,6 +19,10 @@
 #include <thread>
 #include <string>
 #include <tlhelp32.h>
+/*
+#include <Shlobj.h>
+#include <shlwapi.h>
+*/
 
 BOOL CALLBACK EnumWindowsProcMy(HWND hwnd, LPARAM lParam);
 #define GAMEPROCESSOFFLINE EnumWindows(EnumWindowsProcMy, state.cont.getGameProcess())

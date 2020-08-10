@@ -57,13 +57,14 @@ std::string multiByteString(const std::wstring& wstr) // unicode to multibyte st
     return resStr;
 }
 
-/* Savage way of checking installs before SDK got updated
+/*
+// Savage way of checking installs before SDK got updated
 bool DiscordInstalled()
 {
     TCHAR discordPath[MAX_PATH];
     if (SHGetFolderPath(NULL, CSIDL_LOCAL_APPDATA, NULL, 0, discordPath) == S_OK) // accessed the local user's appdata
     {
-        PathAppend(discordPath, TEXT("\\Discord\\.dead"));
+        PathAppend(discordPath, TEXT("\\Discord"));
 
         if (PathIsDirectory(discordPath) == (BOOL)FILE_ATTRIBUTE_DIRECTORY) // discord local appdata exists only when installed
             return true;
@@ -177,11 +178,17 @@ void DiscordInit()
 	GetCurrentDirectoryA(MAX_PATH, install_dir);
 	sprintf_s(install_dir, "%s\\%s", install_dir, "Continuum.exe"); 
 
-    auto result = discord::Core::Create(611578814073405465, DiscordCreateFlags_NoRequireDiscord, &core);
-    state.core.reset(core);
+    if (discord::Core::Create(appID, DiscordCreateFlags_NoRequireDiscord, &core) == discord::Result::Ok)
+        state.core.reset(core);
 
 	if (!state.core) // Discord failed to instantiate
         state.core->~Core();
+
+    // Discord's game launching command 
+    if (state.cont.isSteamUser())
+        state.core->ActivityManager().RegisterSteam(352700);        // this will make it appear in Library as Steam game and launch via Steam
+    else
+        state.core->ActivityManager().RegisterCommand(install_dir); // mainly useful for Join/Spectate activities that are unused here
 
 	// Logger - uncomment when testing
 	/*
@@ -189,12 +196,13 @@ void DiscordInit()
 		MessageBoxA(NULL, message, "Error", MB_ICONERROR);
 	});
 	*/
-	// Discord's game launching command 
-	state.core->ActivityManager().RegisterCommand(install_dir); // this will allow users to launch game from Join and appear in Game Activity/Library (this exe)
-	if (state.cont.isSteamUser())
-		state.core->ActivityManager().RegisterSteam(352700);        // this will make it appear in Library as Steam game and launch via Steam
 
 	// Relevant Events -> these are received by running RunCallbacks() very often
+        /* OnCurrentUserUpdate
+    *  Fires when the User struct of the currently connected user changes. They may have changed their avatar, username, or something else. */
+    state.core->UserManager().OnCurrentUserUpdate.Connect([]() {
+        state.core->UserManager().GetCurrentUser(&state.selfusr);
+        });
 
 	/* OnActivityJoin 
 	*  Fires when a user accepts a game chat invite or receives confirmation from Asking to Join. */
@@ -212,11 +220,7 @@ void DiscordInit()
 /*	state.core->ActivityManager().OnActivityInvite.Connect([](discord::ActivityActionType, discord::User const& user, discord::Activity const&) {
 		state.inviter = user;
 	});
-	/* OnCurrentUserUpdate
-	*  Fires when the User struct of the currently connected user changes. They may have changed their avatar, username, or something else. */
-	state.core->UserManager().OnCurrentUserUpdate.Connect([]() {              
-		state.core->UserManager().GetCurrentUser(&state.selfusr);
-	});
+
 	/* OnToggle
 	*  Fires when the overlay is locked or unlocked (a.k.a.opened or closed) 
 	state.core->OverlayManager().OnToggle.Connect([](bool locked) {       // Continuum not supported? (needs a DirectX handle to THIS process for hook -> ?impossible) 
