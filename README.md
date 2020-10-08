@@ -6,7 +6,7 @@
 Continuum RPC (cRPC) is a plugin used alongside the normal Continuum game executable that provides a Discord rich presence status when using the Continuum client.
 
 ## In which game is this used?
-<p align="center"><a href="https://store.steampowered.com/app/352700/Subspace_Continuum/"><img src="https://cdn.discordapp.com/attachments/447292498226970644/744990362359300136/unknown.png"</a></p>
+<p align="center"><a href="https://store.steampowered.com/app/352700/Subspace_Continuum/"><img src="https://cdn.discordapp.com/attachments/447292498226970644/744990362359300136/unknown.png"</img></a></p>
 
 ## How do I use it?
 * Download the latest official release from [here](https://github.com/purge-dev/ContinuumRPC/releases).
