@@ -12,3 +12,6 @@ Continuum RPC (cRPC) is a plugin used alongside the normal Continuum game execut
 * Download the latest official release from [here](https://github.com/purge-dev/ContinuumRPC/releases).
 * Unzip the contents into your main Continuum folder, overwriting your Continuum.exe (you can make a backup if you wish).
 * Run the game as usual. Any existing shortcuts/launch options you made will still work, and all game platforms on **Windows** are supported. This may also work in **MacOS** and **Linux** using [Wine](https://www.winehq.org/) (untested).
+
+## Features
+A full list of features can be found [here](https://github.com/purge-dev/ContinuumRPC/wiki/Features).
