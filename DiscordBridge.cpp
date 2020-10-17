@@ -57,25 +57,7 @@ std::string multiByteString(const std::wstring& wstr) // unicode to multibyte st
     return resStr;
 }
 
-/*
-// Savage way of checking installs before SDK got updated
-bool DiscordInstalled()
-{
-    TCHAR discordPath[MAX_PATH];
-    if (SHGetFolderPath(NULL, CSIDL_LOCAL_APPDATA, NULL, 0, discordPath) == S_OK) // accessed the local user's appdata
-    {
-        PathAppend(discordPath, TEXT("\\Discord"));
-
-        if (PathIsDirectory(discordPath) == (BOOL)FILE_ATTRIBUTE_DIRECTORY) // discord local appdata exists only when installed
-            return true;
-        else 
-            return false;
-    }
-    else
-        return false;
-}
-*/
-// Keyboard global hook to detect ship changes (unreliable since rate limits must be obeyed)
+// Keyboard hook to detect ship changes (unreliable since rate limits must be obeyed)
 LRESULT CALLBACK LowLevelKeyboardProc(int nCode, WPARAM wParam, LPARAM lParam)
 {
     KBDLLHOOKSTRUCT* pKbdLLHookStruct = (KBDLLHOOKSTRUCT*)lParam;
@@ -178,7 +160,7 @@ void DiscordInit()
 	GetCurrentDirectoryA(MAX_PATH, install_dir);
 	sprintf_s(install_dir, "%s\\%s", install_dir, "Continuum.exe"); 
 
-    if (discord::Core::Create(appID, DiscordCreateFlags_NoRequireDiscord, &core) == discord::Result::Ok)
+    if (discord::Core::Create(611578814073405465, DiscordCreateFlags_NoRequireDiscord, &core) == discord::Result::Ok)
         state.core.reset(core);
 
 	if (!state.core) // Discord failed to instantiate
@@ -223,7 +205,7 @@ void DiscordInit()
 
 	/* OnToggle
 	*  Fires when the overlay is locked or unlocked (a.k.a.opened or closed) 
-	state.core->OverlayManager().OnToggle.Connect([](bool locked) {       // Continuum not supported? (needs a DirectX handle to THIS process for hook -> ?impossible) 
+	state.core->OverlayManager().OnToggle.Connect([](bool locked) {       // (needs a handle to THIS process for hook -> ?injection necessary) 
 		state.overlayLocked = locked;
 	});
 	*/

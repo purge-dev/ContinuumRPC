@@ -108,7 +108,8 @@ void MyActivity::generatePresence()
 				start_time = std::chrono::duration_cast<std::chrono::seconds>(std::chrono::system_clock::now().time_since_epoch()).count();
 				mode = 2;
 			}
-			setSubRPC("", "launcher", "Game Launcher", "Selecting Zone", 0);
+			std::string skin = "Skin: " + multiByteString(state.cont.getRegValue(L"Skin"));
+			setSubRPC(skin.c_str(), "launcher", "Game Launcher", "Selecting Zone", 0);
 		}
 		else if (state.cont.gameWindow() == 3) // doing other things/idle
 		{
