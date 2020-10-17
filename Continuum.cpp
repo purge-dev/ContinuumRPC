@@ -116,7 +116,7 @@ std::wstring Continuum::getRegValue(std::wstring val)
 	}
 	RegCloseKey(hKey);
 }
-
+/* // For future consideration to read from memory to detect ship (unfinished)
 uintptr_t Continuum::GetModuleBaseAddress(DWORD dwProcID)
 {
 	uintptr_t ModuleBaseAddress = 0;
@@ -141,7 +141,6 @@ uintptr_t Continuum::GetModuleBaseAddress(DWORD dwProcID)
 	return ModuleBaseAddress;
 }
 
-/* // For future consideration to read from memory to detect ship (unfinished)
 uint8_t Continuum::GetShip(uintptr_t ModuleBaseAddress)
 {
 	

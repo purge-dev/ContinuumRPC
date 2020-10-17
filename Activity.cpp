@@ -109,7 +109,10 @@ void MyActivity::generatePresence()
 				mode = 2;
 			}
 			std::string skin = "Skin: " + multiByteString(state.cont.getRegValue(L"Skin"));
-			setSubRPC(skin.c_str(), "launcher", "Game Launcher", "Selecting Zone", 0);
+			if (skin.length() > 6) // make sure it returned a proper skin value from registry
+				setSubRPC(skin.c_str(), "launcher", "Game Launcher", "Selecting Zone", 0);
+			else
+				setSubRPC("", "launcher", "Game Launcher", "Selecting Zone", 0);
 		}
 		else if (state.cont.gameWindow() == 3) // doing other things/idle
 		{
