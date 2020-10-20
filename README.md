@@ -9,6 +9,9 @@ Continuum RPC (cRPC) is a plugin used alongside the normal Continuum game execut
 <p align="center"><a href="https://store.steampowered.com/app/352700/Subspace_Continuum/"><img src="https://cdn.discordapp.com/attachments/447292498226970644/744990362359300136/unknown.png"</img></a></p>
 
 ## How do I use it?
+### New Users
+* Simply download the game on [Steam](https://store.steampowered.com/app/352700/Subspace_Continuum) and enable the **Beta** release.
+### Existing Users
 * Download the latest official release from [here](https://github.com/purge-dev/ContinuumRPC/releases).
 * Unzip the contents into your main Continuum folder, overwriting your Continuum.exe (you can make a backup if you wish).
 * Run the game as usual. Any existing shortcuts/launch options you made will still work, and all game platforms on **Windows** are supported. This may also work in **MacOS** and **Linux** using [Wine](https://www.winehq.org/) (untested).
