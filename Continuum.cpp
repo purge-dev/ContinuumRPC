@@ -1,6 +1,19 @@
 #include "DiscordBridge.h"
 
-HANDLE gHandle;
+std::string ReadString(HANDLE handle, size_t address, size_t len)
+{
+	std::string value;
+	SIZE_T read;
+
+	value.resize(len);
+
+	if (ReadProcessMemory(handle, (LPVOID)address, &value[0], len, &read)) {
+		return value;
+	}
+
+	return "";
+}
+
 void Continuum::startGameClient()
 {
 	STARTUPINFO si;
@@ -81,7 +94,10 @@ int Continuum::gameWindow()
 	else if ((CMPSTART("Subspace Continuum 0.40", text) || (CMPSTART("Continuum 0.40", text)))) // launcher
 		return 2;
 	else
-		return 3;
+		if ((FindWindow(0, _T("Continuum")) == NULL) && (FindWindow(0, _T("Subspace Continuum")) == NULL)) // not idling in game but launcher open
+			return 4;
+		else // true idle
+			return 3;
 }
 
 std::wstring Continuum::getRegValue(std::wstring val)
@@ -103,7 +119,7 @@ std::wstring Continuum::getRegValue(std::wstring val)
 
 		return std::to_wstring(buff);
 	}
-	else if (type == REG_SZ) // ie. zone name
+	else if (type == REG_SZ) // ie. zone name/skin
 	{
 		if (RegQueryValueEx(hKey, val.c_str(), NULL, NULL, reinterpret_cast<LPBYTE>(&value[0]), &cbData) != ERROR_SUCCESS)
 			RegCloseKey(hKey);
@@ -116,7 +132,8 @@ std::wstring Continuum::getRegValue(std::wstring val)
 	}
 	RegCloseKey(hKey);
 }
-/* // For future consideration to read from memory to detect ship (unfinished)
+/*
+// TODO: Get player's ship by reading from memory. Unable to get base address for some reason now.
 uintptr_t Continuum::GetModuleBaseAddress(DWORD dwProcID)
 {
 	uintptr_t ModuleBaseAddress = 0;
@@ -129,49 +146,16 @@ uintptr_t Continuum::GetModuleBaseAddress(DWORD dwProcID)
 		{
 			do
 			{
-				if (!lstrcmpi(ModuleEntry32.szModule, L"Continuum_main.exe"))
+				if (!_wcsicmp(ModuleEntry32.szModule, L"Continuum_main.exe"))
 				{
 					ModuleBaseAddress = (uintptr_t)ModuleEntry32.modBaseAddr;
 					break;
 				}
 			} while (Module32Next(hSnapshot, &ModuleEntry32));
 		}
-		CloseHandle(hSnapshot);
+		
 	}
+	CloseHandle(hSnapshot);
 	return ModuleBaseAddress;
 }
-
-uint8_t Continuum::GetShip(uintptr_t ModuleBaseAddress)
-{
-	
-	uintptr_t  gameObjAddr, playerObjectAddr, shipObjAddr;
-	uintptr_t base_addr = GetModuleBaseAddress(getGameProcess());
-	uintptr_t game_addr = base_addr + 0xC1AFC;
-	uintptr_t count_addr = game_addr + 0x1884;
-
-	uintptr_t count = 0;
-	ReadProcessMemory(gHandle, (LPCVOID)(count_addr & 0xFFFF), &count, sizeof(count), NULL);
-	
-	ReadProcessMemory(gHandle, (LPCVOID)game_addr, &gameObjAddr, sizeof(gameObjAddr), NULL);
-	uintptr_t bigplayer_addr = gameObjAddr + 0x884;
-
-	std::vector<uint8_t> player_ships;
-
-	for (uintptr_t i = 0; i < count; ++i)
-	{
-		uintptr_t player_addr = gameObjAddr + 0x13070;
-
-		ReadProcessMemory(gHandle, (LPCVOID)(bigplayer_addr + (i * 4)), &player_addr, sizeof(player_addr), NULL);
-
-		if (player_addr != 0)
-		{
-			uint8_t ship = 0;
-			static_cast<uint8_t>(ReadProcessMemory(gHandle, (LPCVOID)(player_addr + 0x5C), &ship, sizeof(ship), NULL));
-
-			player_ships.push_back(ship);
-		}
-	}
-
-	return player_ships.size();
-} 
 */

@@ -51,7 +51,9 @@ public:
 	bool inGame();
 	int gameWindow();
 	std::wstring getRegValue(std::wstring val);
-	uintptr_t GetModuleBaseAddress(DWORD dwProcID);
+//	uintptr_t GetModuleBaseAddress(DWORD dwProcID);
+//	uint8_t GetShip();
+	HANDLE gHandle;
 	int ship;
 	bool inMenu = false;
 };

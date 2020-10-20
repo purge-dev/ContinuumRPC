@@ -123,6 +123,15 @@ void MyActivity::generatePresence()
 			}
 			setSubRPC("Idle", "idle2", "Waiting for Game", multiByteString(state.cont.getRegValue(L"Zone")).c_str(), now - (now - start_time));
 		}
+		else if (state.cont.gameWindow() == 4) // idle, launcher open and out of focus
+		{
+			if (mode != 1) 
+			{
+				start_time = std::chrono::duration_cast<std::chrono::seconds>(std::chrono::system_clock::now().time_since_epoch()).count();
+				mode = 1;
+			}
+			setSubRPC("Idle", "idle2", "Idle", "Selecting Zone", now - (now - start_time));
+		}
 	}
 
 	state.core->ActivityManager().UpdateActivity(state.core_activity, [](discord::Result result) {
