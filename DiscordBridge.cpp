@@ -1,9 +1,7 @@
 #include "DiscordBridge.h"
-#include "Memory.h"
 
 discord::Core* core{};
 DiscordState state{};
-std::unique_ptr<memory::Memory> gMemory;
 
 // Global Variables:
 #define MAX_LOADSTRING 100
@@ -221,14 +219,8 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     UNREFERENCED_PARAMETER(hPrevInstance);
     UNREFERENCED_PARAMETER(lpCmdLine);
 
-    DWORD pid = 0;
-
 	// Start Continuum_main.exe
-    if (state.cont.startGameClient()) {
-        pid = state.cont.GetPid();
-        //ENABLE THIS FOR MEMORY READING
-        //gMemory = std::make_unique<memory::Memory>(pid);
-    }
+	state.cont.startGameClient();
 
     // Entry point for SDK-Client interface
 	DiscordInit();
@@ -239,9 +231,6 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
         if (GAMEPROCESSOFFLINE == 0) // game process is available
         {
             state.activity.generatePresence();
-            //ENABLE THESE FOR MEMORY READING
-            //gMemory->Update();
-            //state.cont.ship = gMemory->GetPlayer().ship;
             state.cont.ship = atoi(multiByteString(state.cont.getRegValue(L"Ship")).c_str()); // sets ship status as last played ship
         }
 		else                      // exit out if it hasn't started -> ?remove because of slow PCs

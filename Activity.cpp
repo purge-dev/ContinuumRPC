@@ -1,6 +1,6 @@
 #include "DiscordBridge.h"
 
-uint64_t start_time = std::chrono::duration_cast<std::chrono::seconds>(std::chrono::system_clock::now().time_since_epoch()).count();
+double start_time = std::chrono::duration_cast<std::chrono::seconds>(std::chrono::system_clock::now().time_since_epoch()).count();
 int mode = -1;
 
 /* Joining/Party is too troublesome to implement and is useless now
@@ -51,7 +51,7 @@ void MyActivity::setSubRPC(const char* stateText, const char* smallImage, const 
 // Sets the user's presence every 6 seconds according to window mode/ship status
 void MyActivity::generatePresence()
 {
-	uint64_t now = std::chrono::duration_cast<std::chrono::seconds>(std::chrono::system_clock::now().time_since_epoch()).count();
+	double now = std::chrono::duration_cast<std::chrono::seconds>(std::chrono::system_clock::now().time_since_epoch()).count();
 	setMainRPC("large-ss", "Subspace Continuum", discord::ActivityType::Playing); // set the common rich presence assets
 	/*
 	if (strcmp(state.core_activity.GetParty().GetId(), "") == 0) // is this user in a party?
