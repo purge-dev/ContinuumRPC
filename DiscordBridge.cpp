@@ -226,7 +226,8 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	// Start Continuum_main.exe
     if (state.cont.startGameClient()) {
         pid = state.cont.GetPid();
-        gMemory = std::make_unique<memory::Memory>(pid);
+        //ENABLE THIS FOR MEMORY READING
+        //gMemory = std::make_unique<memory::Memory>(pid);
     }
 
     // Entry point for SDK-Client interface
@@ -238,7 +239,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
         if (GAMEPROCESSOFFLINE == 0) // game process is available
         {
             state.activity.generatePresence();
-            //enable these to test memory reading
+            //ENABLE THESE FOR MEMORY READING
             //gMemory->Update();
             //state.cont.ship = gMemory->GetPlayer().ship;
             state.cont.ship = atoi(multiByteString(state.cont.getRegValue(L"Ship")).c_str()); // sets ship status as last played ship
