@@ -14,9 +14,8 @@ std::string ReadString(HANDLE handle, size_t address, size_t len)
 	return "";
 }
 
-bool Continuum::startGameClient()
+void Continuum::startGameClient()
 {
-	bool result = false;
 	STARTUPINFO si;
 	PROCESS_INFORMATION processInfo;
 	ZeroMemory(&si, sizeof(si));
@@ -26,14 +25,12 @@ bool Continuum::startGameClient()
 	if (CreateProcess(L"Continuum_main.exe", L"cmd", NULL, NULL, TRUE, 0, NULL, NULL, &si, &processInfo))
 	{
 		WaitForSingleObject(processInfo.hProcess, INFINITE);
-		//pretty sure gHandle won't work because you are closing hProcess in the next line (something about hProccess being a pointer)
 		gHandle = processInfo.hProcess;
-		pid_ = processInfo.dwProcessId;
+
 		CloseHandle(processInfo.hProcess);
 		CloseHandle(processInfo.hThread);
-		result = true;
 	}
-	return result;
+	return;
 }
 
 DWORD Continuum::getGameProcess()
@@ -55,7 +52,6 @@ DWORD Continuum::getGameProcess()
 	}
 
 	CloseHandle(snapshot);
-	return 0;
 }
 
 bool Continuum::isSteamUser()
