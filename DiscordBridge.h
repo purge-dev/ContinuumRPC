@@ -45,17 +45,23 @@ public:
 class Continuum
 {
 public:
-	void startGameClient();
+	bool startGameClient();
 	DWORD getGameProcess();
 	bool isSteamUser();
 	bool inGame();
 	int gameWindow();
 	std::wstring getRegValue(std::wstring val);
+	// allow public read access to pid via a return function 
+	DWORD& GetPid() { return pid_; }
+
 //	uintptr_t GetModuleBaseAddress(DWORD dwProcID);
 //	uint8_t GetShip();
 	HANDLE gHandle;
 	int ship;
 	bool inMenu = false;
+private:
+	// keep this private so only the Continuum class members can modify it
+	DWORD pid_;
 };
 
 struct DiscordState 
