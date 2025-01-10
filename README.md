@@ -1,6 +1,6 @@
 <p align="center"><b>Continuum Rich Presence (cRPC)</b></p>
 
-<p align="center"><img src="https://cdn.discordapp.com/attachments/447292498226970644/740429255359463576/rpc.png"></p>
+<p align="center"><img src="https://github.com/purge-dev/ContinuumRPC/blob/master/web_assets/rpc.png"></p>
 
 ## What is it?
 Continuum RPC (cRPC) is a plugin used alongside the normal Continuum game executable that provides a Discord rich presence status when using the Continuum client.
