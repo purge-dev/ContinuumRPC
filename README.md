@@ -1,4 +1,4 @@
-# <p align="center"><b>Continuum Rich Presence (cRPC)</b></p>
+# <p align="center"><b>Continuum Rich Presence (cRPC)</b> [![CodeFactor](https://www.codefactor.io/repository/github/purge-dev/clinicord/badge)](https://www.codefactor.io/repository/github/purge-dev/clinicord) [![GitHub stars](https://img.shields.io/github/stars/purge-dev/ContinuumRPC)](https://github.com/purge-dev/ContinuumRPC/stargazers) [![GitHub issues](https://img.shields.io/github/issues/purge-dev/ContinuumRPC)](https://github.com/purge-dev/ContinuumRPC/issues) </p>
 
 <p align="center"><img src="https://github.com/purge-dev/ContinuumRPC/blob/master/web_assets/rpc.png"></p>
 
