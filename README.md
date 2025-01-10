@@ -1,4 +1,4 @@
-<p align="center"><b>Continuum Rich Presence (cRPC)</b></p>
+# <p align="center"><b>Continuum Rich Presence (cRPC)</b></p>
 
 <p align="center"><img src="https://github.com/purge-dev/ContinuumRPC/blob/master/web_assets/rpc.png"></p>
 
